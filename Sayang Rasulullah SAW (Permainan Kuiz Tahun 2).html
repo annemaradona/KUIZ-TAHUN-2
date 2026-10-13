@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuiz Interaktif: Sayang Rasulullah SAW (Tahun 2)</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts: Fredoka & Lexend -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'cursive'],
+                        lexend: ['Lexend', 'sans-serif'],
+                    },
+                    colors: {
+                        pastelYellow: '#fff9db',
+                        pastelBlue: '#e7f5ff',
+                        pastelPink: '#fff0f6',
+                        pastelGreen: '#ebfbee',
+                        brandPurple: '#845ef7',
+                        brandYellow: '#fcc419',
+                        brandGreen: '#51cf66',
+                        brandPink: '#ff6b6b',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 50%, #4338ca 100%);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .font-fredoka {
+            font-family: 'Fredoka', cursive;
+        }
+
+        /* Soft rounded elevation shadow */
+        .game-card-shadow {
+            box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.3), 0 10px 15px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Interactive option buttons with subtle 3D tactile feedback */
+        .btn-option {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom-width: 6px;
+        }
+
+        .btn-option:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.03);
+        }
+
+        .btn-option:active:not(:disabled) {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+        }
+
+        /* Animations */
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pop {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.35s ease-in-out;
+        }
+
+        /* Progress Bar Caterpillar / Star Styling */
+        .progress-indicator {
+            transition: width 0.4s ease-out;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-3 sm:p-6 min-h-screen">
+
+    <div class="w-full max-w-lg mx-auto relative">
+        
+        <!-- Outer Game Container -->
+        <div class="bg-amber-50 game-card-shadow rounded-3xl p-5 sm:p-8 border-4 border-white relative overflow-hidden text-center">
+
+            <!-- Decorative Ambient Glows -->
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-yellow-300/40 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-pink-400/30 rounded-full blur-2xl pointer-events-none"></div>
+
+            <!-- Top Header Badge -->
+            <div class="mb-4">
+                <span class="inline-flex items-center gap-1.5 bg-yellow-300 text-purple-950 font-bold text-xs sm:text-sm px-4 py-1.5 rounded-full uppercase tracking-wide border-2 border-yellow-400 shadow-sm">
+                    <i class="fa-solid fa-star text-amber-600 animate-spin" style="animation-duration: 8s;"></i> 
+                    Pendidikan Islam Tahun 2
+                </span>
+                <h1 class="font-fredoka text-2xl sm:text-3xl text-purple-900 mt-2 drop-shadow-sm flex items-center justify-center gap-2">
+                    <span>🌸</span> <span>SAYANG RASULULLAH</span> <span>🌸</span>
+                </h1>
+            </div>
+
+            <!-- START SCREEN -->
+            <div id="start-screen" class="py-2 animate-pop">
+                <div class="w-28 h-28 bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl text-white text-5xl border-4 border-white animate-float">
+                    <i class="fa-solid fa-mosque"></i>
+                </div>
+
+                <h2 class="font-fredoka text-2xl text-slate-800 mb-2">Mari Main Kuiz Interaktif!</h2>
+                <p class="text-slate-600 text-sm mb-6 leading-relaxed">
+                    Uji kefahaman adik-adik tentang adab dan kasih sayang kepada Nabi Muhammad SAW dalam 10 soalan santai & warna-warni!
+                </p>
+
+                <div class="bg-white/90 rounded-2xl p-4 mb-6 text-left text-xs sm:text-sm text-slate-700 border-2 border-purple-200 shadow-sm space-y-2">
+                    <div class="font-bold text-purple-900 flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Cara Bermain:
+                    </div>
+                    <p class="flex items-center gap-2"><span>⭐</span> <span>Jawab 10 soalan ringkas dengan tepat.</span></p>
+                    <p class="flex items-center gap-2"><span>🎵</span> <span>Nikmati bunyi ceria & kumpul 5 Bintang Emas!</span></p>
+                    <p class="flex items-center gap-2"><span>🎉</span> <span>Kumpul markah penuh untuk dapatkan kejutan confetti!</span></p>
+                </div>
+
+                <button onclick="startGame()" class="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-fredoka text-xl sm:text-2xl rounded-2xl border-b-6 border-emerald-700 shadow-lg active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play"></i> MULA SEKARANG!
+                </button>
+            </div>
+
+            <!-- QUIZ SCREEN -->
+            <div id="quiz-screen" class="hidden">
+                <!-- Progress Indicator Bar -->
+                <div class="mb-4">
+                    <div class="flex justify-between items-center text-xs sm:text-sm font-bold text-slate-600 mb-1.5 px-1">
+                        <span id="progress-text" class="font-fredoka text-purple-900">Soalan 1 daripada 10</span>
+                        <span class="bg-amber-100 text-amber-800 px-3 py-0.5 rounded-full border border-amber-300 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-star text-amber-500"></i> Skor: <span id="live-score">0</span>
+                        </span>
+                    </div>
+
+                    <!-- Progress Line with Caterpillar / Star Icon -->
+                    <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden p-0.5 border border-slate-300 relative shadow-inner">
+                        <div id="progress-bar-inner" class="progress-indicator bg-gradient-to-r from-teal-400 via-emerald-400 to-amber-400 h-full rounded-full w-[10%]"></div>
+                    </div>
+                </div>
+
+                <!-- Question Box -->
+                <div class="bg-white/90 border-3 border-dashed border-purple-300 rounded-2xl p-4 sm:p-5 mb-5 shadow-sm min-h-[100px] flex items-center justify-center relative">
+                    <p id="question-text" class="font-fredoka text-lg sm:text-xl text-slate-800 leading-snug">
+                        Soalan akan dipaparkan di sini...
+                    </p>
+                </div>
+
+                <!-- Options Grid (3 Buttons) -->
+                <div id="options-box" class="grid grid-cols-1 gap-3.5 mb-2">
+                    <!-- Dynamic Answer Buttons Inserted by JS -->
+                </div>
+            </div>
+
+            <!-- RESULT SCREEN -->
+            <div id="result-screen" class="hidden py-3 animate-pop">
+                <div class="mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">
+                        Keputusan Akhir
+                    </span>
+                </div>
+
+                <!-- Star Rating Display -->
+                <div class="flex justify-center items-center gap-2 my-3">
+                    <i id="star-1" class="fa-solid fa-star text-3xl sm:text-4xl text-slate-300 transition-all duration-300"></i>
+                    <i id="star-2" class="fa-solid fa-star text-4xl sm:text-5xl text-slate-300 transition-all duration-300"></i>
+                    <i id="star-3" class="fa-solid fa-star text-5xl sm:text-6xl text-slate-300 transition-all duration-300"></i>
+                    <i id="star-4" class="fa-solid fa-star text-4xl sm:text-5xl text-slate-300 transition-all duration-300"></i>
+                    <i id="star-5" class="fa-solid fa-star text-3xl sm:text-4xl text-slate-300 transition-all duration-500"></i>
+                </div>
+
+                <!-- Score Counter -->
+                <div class="bg-amber-100 border-2 border-amber-300 rounded-2xl py-3 px-6 inline-block my-2">
+                    <div id="final-score-text" class="font-fredoka text-4xl sm:text-5xl text-purple-950">0 / 10</div>
+                    <p class="text-xs font-bold text-amber-800 mt-0.5">SOALAN BETUL</p>
+                </div>
+
+                <h2 id="result-title" class="font-fredoka text-2xl sm:text-3xl text-purple-900 mt-2 mb-1">Syabas!</h2>
+                <p id="result-subtitle" class="text-slate-600 text-sm sm:text-base mb-6 px-4">
+                    Kamu seorang murid yang anak soleh dan mengasihi Rasulullah SAW!
+                </p>
+
+                <button onclick="restartGame()" class="w-full py-4 bg-sky-500 hover:bg-sky-400 text-white font-fredoka text-xl rounded-2xl border-b-6 border-sky-700 shadow-lg active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> MAIN SEMULA 🔄
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Footer Tag -->
+        <p class="text-center text-white/90 text-xs sm:text-sm mt-4 font-medium drop-shadow-sm">
+            ❤️ Didik Generasi Cintakan Allah & Rasulullah SAW
+        </p>
+    </div>
+
+    <script>
+        // Web Audio API Synthesizer for self-contained, instant sound effects
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                // Happy cheerful chime
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+                osc.start(now);
+                osc.stop(now + 0.45);
+            } else if (type === 'wrong') {
+                // Low soft boop
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.frequency.setValueAtTime(220, now); // A3
+                osc.frequency.setValueAtTime(164.81, now + 0.12); // E3
+
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'win') {
+                // Fanfare melody for end screen
+                const notes = [523.25, 659.25, 783.99, 880, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const oscWin = audioCtx.createOscillator();
+                    const gainWin = audioCtx.createGain();
+                    oscWin.type = 'sine';
+                    oscWin.connect(gainWin);
+                    gainWin.connect(audioCtx.destination);
+
+                    oscWin.frequency.setValueAtTime(freq, now + (idx * 0.11));
+                    gainWin.gain.setValueAtTime(0.18, now + (idx * 0.11));
+                    gainWin.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.11) + 0.35);
+
+                    oscWin.start(now + (idx * 0.11));
+                    oscWin.stop(now + (idx * 0.11) + 0.35);
+                });
+            }
+        }
+
+        // 10 SOALAN SPESIFIK & TEPAT UNTUK PENDIDIKAN ISLAM TAHUN 2
+        const quizData = [
+            {
+                question: "1. Apakah cara kita mengasihi Rasulullah SAW dalam kehidupan harian?",
+                options: [
+                    { text: "Mengikut ajaran dan sunnah Baginda", emoji: "✨" },
+                    { text: "Bercakap kasar dengan rakan", emoji: "🗣️" },
+                    { text: "Abaikan ajaran Baginda", emoji: "❌" }
+                ],
+                answer: 0
+            },
+            {
+                question: "2. Kita hendaklah menjadikan Rasulullah SAW sebagai...",
+                options: [
+                    { text: "Musuh kita", emoji: "⚠️" },
+                    { text: "Contoh ikutan yang terbaik", emoji: "🌟" },
+                    { text: "Orang yang dilupakan", emoji: "🚫" }
+                ],
+                answer: 1
+            },
+            {
+                question: "3. Apakah adab mengasihi Rasulullah semasa berada di RUMAH?",
+                options: [
+                    { text: "Taat ibu bapa dan jaga kebersihan", emoji: "🏡" },
+                    { text: "Buat bising waktu malam", emoji: "📢" },
+                    { text: "Bergaduh dengan adik-beradik", emoji: "🤼" }
+                ],
+                answer: 0
+            },
+            {
+                question: "4. Bagaimanakah kita mengamalkan adab di SEKOLAH?",
+                options: [
+                    { text: "Melanggar peraturan sekolah", emoji: "🚷" },
+                    { text: "Taat kepada guru dan patuh peraturan", emoji: "🏫" },
+                    { text: "Ejek rakan-rakan", emoji: "😜" }
+                ],
+                answer: 1
+            },
+            {
+                question: "5. Apakah adab mengikut sunnah Nabi semasa di KANTIN?",
+                options: [
+                    { text: "Makan sambil berlari", emoji: "🏃" },
+                    { text: "Membuang makanan", emoji: "🗑️" },
+                    { text: "Mengamalkan adab makan dan minum", emoji: "🍽️" }
+                ],
+                answer: 2
+            },
+            {
+                question: "6. Di PADANG atau tempat sukan, kita hendaklah...",
+                options: [
+                    { text: "Menutup aurat dengan sempurna", emoji: "⚽" },
+                    { text: "Memakai pakaian terdedah", emoji: "❌" },
+                    { text: "Bergaduh dengan lawan", emoji: "⚡" }
+                ],
+                answer: 0
+            },
+            {
+                question: "7. Apakah adab yang perlu dijaga semasa berada di MASJID?",
+                options: [
+                    { text: "Menjaga keheningan dan tidak bising", emoji: "🕌" },
+                    { text: "Lari bertaburan", emoji: "🏃‍♂️" },
+                    { text: "Menjerit dengan kuat", emoji: "🔊" }
+                ],
+                answer: 0
+            },
+            {
+                question: "8. Apabila kita berselawat 1 kali kepada Nabi, Allah memberi ganjaran...",
+                options: [
+                    { text: "10 kali rahmat / selawat", emoji: "🎁" },
+                    { text: "Tiada ganjaran", emoji: "❌" },
+                    { text: "1 kali sahaja", emoji: "1️⃣" }
+                ],
+                answer: 0
+            },
+            {
+                question: "9. Orang yang sentiasa mengamalkan adab akan mendapat...",
+                options: [
+                    { text: "Syafaat (pertolongan) Nabi di akhirat", emoji: "🤲" },
+                    { text: "Kesusahan hidup", emoji: "😞" },
+                    { text: "Ejekan kawan", emoji: "👎" }
+                ],
+                answer: 0
+            },
+            {
+                question: "10. Mengamalkan adab dapat menambahkan...",
+                options: [
+                    { text: "Sifat malas", emoji: "😴" },
+                    { text: "Iman dan rasa cinta kepada Nabi", emoji: "💖" },
+                    { text: "Sifat marah", emoji: "😡" }
+                ],
+                answer: 1
+            }
+        ];
+
+        // State variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // Elements
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const questionText = document.getElementById('question-text');
+        const optionsBox = document.getElementById('options-box');
+        
+        const liveScore = document.getElementById('live-score');
+        const progressText = document.getElementById('progress-text');
+        const progressBarInner = document.getElementById('progress-bar-inner');
+
+        function startGame() {
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            liveScore.innerText = "0";
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            const currentQ = quizData[currentQuestionIndex];
+            
+            const currentNum = currentQuestionIndex + 1;
+            const totalNum = quizData.length;
+            const percentage = Math.round((currentNum / totalNum) * 100);
+            
+            progressText.innerText = `Soalan ${currentNum} daripada ${totalNum}`;
+            progressBarInner.style.width = `${percentage}%`;
+
+            questionText.innerText = currentQ.question;
+            optionsBox.innerHTML = '';
+            
+            // Color palettes for answer buttons (Bright Pastel 3D style)
+            const buttonThemes = [
+                'bg-sky-400 hover:bg-sky-300 border-sky-600 text-white',
+                'bg-amber-400 hover:bg-amber-300 border-amber-600 text-slate-900',
+                'bg-indigo-400 hover:bg-indigo-300 border-indigo-600 text-white'
+            ];
+
+            const optionLabels = ["A", "B", "C"];
+
+            currentQ.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                const themeClass = buttonThemes[idx % buttonThemes.length];
+                
+                btn.className = `btn-option w-full ${themeClass} p-3.5 sm:p-4 rounded-2xl font-bold text-base sm:text-lg flex items-center justify-between text-left shadow-md cursor-pointer`;
+                btn.innerHTML = `
+                    <span class="flex items-center gap-3">
+                        <span class="bg-white/20 px-2.5 py-0.5 rounded-lg text-sm font-fredoka">${optionLabels[idx]}</span>
+                        <span class="text-xl">${opt.emoji}</span>
+                        <span>${opt.text}</span>
+                    </span>
+                    <i class="fa-regular fa-circle text-white/80 text-xl flex-shrink-0"></i>
+                `;
+                
+                btn.onclick = () => checkAnswer(btn, idx === currentQ.answer, currentQ.answer);
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedBtn, isCorrect, correctIndex) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const buttons = optionsBox.querySelectorAll('button');
+            buttons.forEach(b => b.style.pointerEvents = 'none');
+
+            if (isCorrect) {
+                playSound('correct');
+                score++;
+                liveScore.innerText = score;
+                
+                selectedBtn.className = 'btn-option w-full bg-emerald-500 border-emerald-700 text-white p-3.5 sm:p-4 rounded-2xl font-bold text-base sm:text-lg flex items-center justify-between text-left shadow-lg animate-pop';
+                selectedBtn.querySelector('i').className = 'fa-solid fa-circle-check text-white text-2xl';
+
+                // Gentle burst for every correct answer
+                confetti({
+                    particleCount: 25,
+                    spread: 50,
+                    origin: { y: 0.75 }
+                });
+            } else {
+                playSound('wrong');
+                selectedBtn.className = 'btn-option w-full bg-rose-500 border-rose-700 text-white p-3.5 sm:p-4 rounded-2xl font-bold text-base sm:text-lg flex items-center justify-between text-left shadow-lg animate-shake';
+                selectedBtn.querySelector('i').className = 'fa-solid fa-circle-xmark text-white text-2xl';
+
+                // Highlight correct answer in green
+                buttons[correctIndex].className = 'btn-option w-full bg-emerald-500 border-emerald-700 text-white p-3.5 sm:p-4 rounded-2xl font-bold text-base sm:text-lg flex items-center justify-between text-left shadow-lg';
+                buttons[correctIndex].querySelector('i').className = 'fa-solid fa-circle-check text-white text-2xl';
+            }
+
+            // Short pause before moving to next question
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1200);
+        }
+
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            playSound('win');
+
+            document.getElementById('final-score-text').innerText = `${score} / ${quizData.length}`;
+
+            const stars = [
+                document.getElementById('star-1'),
+                document.getElementById('star-2'),
+                document.getElementById('star-3'),
+                document.getElementById('star-4'),
+                document.getElementById('star-5')
+            ];
+
+            // Reset star colors
+            stars.forEach(s => s.className = "fa-solid fa-star text-slate-300 transition-all duration-300 text-3xl sm:text-4xl");
+
+            const title = document.getElementById('result-title');
+            const subtitle = document.getElementById('result-subtitle');
+
+            let starsEarned = Math.round((score / quizData.length) * 5);
+            if (score > 0 && starsEarned === 0) starsEarned = 1;
+
+            // Sequential star pop animation
+            setTimeout(() => {
+                for (let i = 0; i < starsEarned; i++) {
+                    setTimeout(() => {
+                        stars[i].className = "fa-solid fa-star text-amber-400 transition-all duration-300 transform scale-125 drop-shadow-md text-3xl sm:text-4xl";
+                    }, i * 160);
+                }
+
+                if (score === 10) {
+                    title.innerText = "HEBAT SANGAT! 🌟";
+                    subtitle.innerText = "Syabas! Anda Anak Soleh Sayang Nabi SAW! Cikgu sangat bangga dengan kamu!";
+                    // Grand confetti celebration for full marks
+                    confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 } });
+                } else if (score >= 7) {
+                    title.innerText = "BAGUS SANGAT! 👍";
+                    subtitle.innerText = "Syabas! Teruskan usaha amalkan adab dan sunnah Nabi Muhammad SAW hari-hari ya!";
+                    confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+                } else if (score >= 5) {
+                    title.innerText = "PANDAI! 😊";
+                    subtitle.innerText = "Usaha yang baik! Boleh cuba lagi sekali untuk dapatkan 5 Bintang Emas penuh!";
+                } else {
+                    title.innerText = "CUBA LAGI YA! 💪";
+                    subtitle.innerText = "Jangan putus asa, tekan butang di bawah untuk ulang semula permainan!";
+                }
+            }, 200);
+        }
+
+        function restartGame() {
+            startGame();
+        }
+    </script>
+</body>
+</html>
